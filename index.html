@@ -3,125 +3,210 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Crop Prediction Model</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <title>Crop & Fertilizer Predictor</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
     <style>
         body {
-    font-family: 'Arial', sans-serif;
-    background: linear-gradient(135deg, #ff7e5f, #feb47b);
-    margin: 0;
-    padding: 0;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-}
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #e0f2f7, #c1e4f2);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            color: #333;
+        }
+        .dashboard-container {
+            background-color: #ffffff;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            width: 90%;
+            max-width: 800px;
+            text-align: center;
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 30px;
+        }
+        h1 {
+            color: #2c3e50;
+            margin-bottom: 30px;
+            font-weight: 600;
+            font-size: 2.2em;
+        }
+        .prediction-section {
+            background-color: #f9f9f9;
+            padding: 30px;
+            border-radius: 10px;
+            border: 1px solid #e0e0e0;
+        }
+        h2 {
+            color: #34495e;
+            margin-bottom: 20px;
+            font-weight: 400;
+            font-size: 1.6em;
+        }
+        .input-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+        .input-group {
+            text-align: left;
+        }
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+            font-weight: 400;
+        }
+        .input-group input {
+            width: calc(100% - 20px);
+            padding: 12px 10px;
+            border: 1px solid #cddc39; /* Changed border color */
+            border-radius: 8px;
+            font-size: 1em;
+            transition: border-color 0.3s ease;
+        }
+        .input-group input:focus {
+            border-color: #8bc34a; /* Darker green on focus */
+            outline: none;
+            box-shadow: 0 0 5px rgba(139, 195, 74, 0.5);
+        }
+        button {
+            background-color: #8bc34a; /* Greenish button */
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1.1em;
+            font-weight: 600;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            box-shadow: 0 4px 10px rgba(139, 195, 74, 0.3);
+        }
+        button:hover {
+            background-color: #7cb342; /* Darker green on hover */
+            transform: translateY(-2px);
+        }
+        #result {
+            margin-top: 30px;
+            padding: 25px;
+            background-color: #e8f5e9; /* Light green background for result */
+            border-radius: 10px;
+            border: 1px solid #a5d6a7;
+            text-align: left;
+            min-height: 100px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+        #result p {
+            font-size: 1.1em;
+            margin: 8px 0;
+            color: #388e3c; /* Darker green for result text */
+        }
+        #result strong {
+            color: #1b5e20; /* Even darker green for strong text */
+        }
+        #result img {
+            margin-top: 20px;
+            max-width: 100%;
+            border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        #result p.error {
+            color: #d32f2f; /* Red for error messages */
+            font-weight: 600;
+        }
 
-.container {
-    background-color: rgba(255, 255, 255, 0.9);
-    padding: 40px;
-    border-radius: 20px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    text-align: center;
-}
-
-h1 {
-    color: #333;
-    margin-bottom: 20px;
-}
-
-.input-group {
-    margin-bottom: 15px;
-    text-align: left;
-}
-
-.input-group label {
-    display: block;
-    margin-bottom: 5px;
-    color: #555;
-}
-
-.input-group input {
-    width: 100%;
-    padding: 10px;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-    font-size: 16px;
-}
-
-button {
-    background-color: #ff6b6b;
-    color: #fff;
-    border: none;
-    padding: 10px 20px;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 16px;
-    transition: background-color 0.3s ease;
-}
-
-button:hover {
-    background-color: #ff4d4d;
-}
-
-#result {
-    margin-top: 20px;
-    padding: 10px;
-    background-color: #f9f9f9;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-    text-align: left;
-    font-size: 18px;
-    color: #333;
-}
+        /* Responsive adjustments */
+        @media (max-width: 600px) {
+            .input-grid {
+                grid-template-columns: 1fr;
+            }
+            .dashboard-container {
+                padding: 20px;
+            }
+            h1 {
+                font-size: 1.8em;
+            }
+            h2 {
+                font-size: 1.4em;
+            }
+        }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>Crop Prediction Model</h1>
-        <form id="prediction-form">
-            <div class="input-group">
-                <label for="nitrogen">Nitrogen Level:</label>
-                <input type="number" id="nitrogen" name="nitrogen" required>
-            </div>
-            <div class="input-group">
-                <label for="temperature">Temperature:</label>
-                <input type="number" id="temperature" name="temperature" required>
-            </div>
-            <div class="input-group">
-                <label for="rainfall">Rainfall:</label>
-                <input type="number" id="rainfall" name="rainfall" required>
-            </div>
-            <button type="submit">Predict</button>
-        </form>
-        <div id="result"></div>
+    <div class="dashboard-container">
+        <h1>🌱 Crop & Fertilizer Recommendation System 🌱</h1>
+        
+        <div class="prediction-section">
+            <h2>Enter Environmental Parameters</h2>
+            <form id="prediction-form">
+                <div class="input-grid">
+                    <div class="input-group">
+                        <label for="nitrogen">Nitrogen (kg/ha):</label>
+                        <input type="number" id="nitrogen" name="nitrogen" required min="0" step="any">
+                    </div>
+                    <div class="input-group">
+                        <label for="temperature">Temperature (°C):</label>
+                        <input type="number" id="temperature" name="temperature" required step="0.1">
+                    </div>
+                    <div class="input-group">
+                        <label for="rainfall">Rainfall (mm):</label>
+                        <input type="number" id="rainfall" name="rainfall" required min="0" step="any">
+                    </div>
+                    <div class="input-group">
+                        <label for="ph">pH Value:</label>
+                        <input type="number" step="0.1" id="ph" name="ph" required min="0" max="14">
+                    </div>
+                    <div class="input-group">
+                        <label for="humidity">Humidity (%):</label>
+                        <input type="number" id="humidity" name="humidity" required min="0" max="100">
+                    </div>
+                </div>
+                <button type="submit">Get Crop & Fertilizer Recommendation</button>
+            </form>
+        </div>
+
+        <div id="result">
+            <p>Your prediction results will appear here!</p>
+        </div>
     </div>
 
     <script>
         document.getElementById('prediction-form').addEventListener('submit', function(event) {
             event.preventDefault();
-            const nitrogen = document.getElementById('nitrogen').value;
-            const temperature = document.getElementById('temperature').value;
-            const rainfall = document.getElementById('rainfall').value;
+            const formData = new URLSearchParams(new FormData(this)).toString();
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = '<p>Loading results...</p>'; // Show loading message
 
             fetch('/predict', {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded',
-                },
-                body: `nitrogen=${nitrogen}&temperature=${temperature}&rainfall=${rainfall}`
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: formData
             })
             .then(response => response.json())
             .then(data => {
                 if (data.best_crop && data.best_fertilizer) {
-                    document.getElementById('result').innerHTML = `<p>The best crop for Nitrogen=${nitrogen}, Temperature=${temperature}, Rainfall=${rainfall} is: ${data.best_crop}</p>
-                                                        <p>Recommended Fertilizer: ${data.best_fertilizer}</p>`;
+                    resultDiv.innerHTML = `
+                        <p>Based on your inputs, the <strong>Best Crop</strong> to grow is: <strong>${data.best_crop}</strong></p>
+                        <p>The <strong>Recommended Fertilizer</strong> for ${data.best_crop} is: <strong>${data.best_fertilizer}</strong></p>
+                        <img src="data:image/png;base64,${data.graph}" alt="Input parameters visualization">
+                    `;
+                } else if (data.error) {
+                    resultDiv.innerHTML = `<p class="error">Error: ${data.error}</p>`;
                 } else {
-                    document.getElementById('result').innerHTML = `<p>Error: ${data.error}</p>`;
+                    resultDiv.innerHTML = `<p class="error">An unexpected error occurred.</p>`;
                 }
             })
             .catch(error => {
-                document.getElementById('result').innerHTML = `<p>Error: ${error}</p>`;
+                console.error('Fetch error:', error);
+                resultDiv.innerHTML = `<p class="error">Failed to connect to the server. Please try again.</p>`;
             });
         });
     </script>
